@@ -1,5 +1,5 @@
 from Staff import staff
-from Main import c
+from Main import c          # if we use separate files, would have to import c (too complex?)
 import sqlite3
 
 class doctor(staff):
@@ -9,36 +9,36 @@ class doctor(staff):
     to perform the specified task. Goes to the logout screen
     when the user is finished.
     '''
-    def print_doctor_welcome(self):
+    def get_doctor_task(self):
     
-        print("Welcome, Doctor. Here are the tasks you can perform:")
-        while (1):
-            print("-"*10)
-            print("1: List all charts in the system.")
-            print("2: Add a symptom to a patient's chart.")
-            print("3: Add a diagnosis to a patient's chart.")
-            print("4: Add a medication to a patient's chart.")
-            key = int(input(print("Enter the number that corresponds to the task (0 to logout): ")))
-            
-            #if key == 1:
-            #    first_task()
-            
-            #elif key == 2:
-            #    Hcno = input(print("Enter the patient's hcno: "))
-            #    second_task(Hcno)
-            
-            #elif key == 3:
-                # call function
-            
-            #elif key == 4:
-                # call function
-            
-            #elif key == 0:
-                # call function that logs the user out        
+        print("Welcome, doctor. Here are the tasks you can perform:")
         
-        # can do this?        
-        return key
-    
+        print("-"*10)
+        print("1: List all charts in the system.")
+        print("2: Add a symptom to a patient's chart.")
+        print("3: Add a diagnosis to a patient's chart.")
+        print("4: Add a medication to a patient's chart.")
+        key = int(input(print("Enter the number that corresponds to the task (0 to logout): ")))
+        return key        
+        
+        ''' start section: this code can go in main or the login thing maybe '''
+        #if key == 1:
+                #    first_task()
+
+                #elif key == 2:
+                #    Hcno = input(print("Enter the patient's hcno: "))
+                #    second_task(Hcno)
+
+                #elif key == 3:
+                    # call function
+
+                #elif key == 4:
+                    # call function
+
+                #elif key == 0:
+                    # call function that logs the user out        
+        ''' end section '''
+               
     '''
     Performs the first task using an SQL query
     '''

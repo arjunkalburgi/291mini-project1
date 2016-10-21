@@ -14,6 +14,8 @@ Comments:
     staff member to the table in the database...
 -   the second_task function isn't finished, and
     we can move things around if we need to
+-   oops, that while loop shouldn't be in print_welcome
+    anymore.
 
 Mercy tasks Oct 20:
 1. Finish login

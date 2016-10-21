@@ -6,7 +6,7 @@ Andrea tasks Oct 20:
 2. read over lab powerpoint
 
 Comments:
--   I feel like I'm going to far on the Python
+-   I feel like I'm going too far on the Python
     side of things and not actually interacting
     with the database enough -- like in
     __init__ for staff, I initialize the values
@@ -15,7 +15,7 @@ Comments:
 -   the second_task function isn't finished, and
     we can move things around if we need to
 -   oops, that while loop shouldn't be in print_welcome
-    anymore.
+    anymore (now erased)
 
 Mercy tasks Oct 20:
 1. Finish login

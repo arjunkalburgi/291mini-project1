@@ -304,23 +304,23 @@ def main():
     
     user = loginScreen(c, conn)
     
-    key = 10
+    key = 'z'
     if user == 'D':
         
-        while key != 0:
+        while key != '0':
 
-            key = get_doctor_task()            
+            key = getDoctorTask()            
             
-            if key == 1:
-                first_task(c, conn)
-            elif key == 2:
+            if key == '1':
+                firstTask(c, conn)
+            elif key == '2':
                 Hcno = input(print("Enter the patient's hcno: "))
-                second_task(c, conn, staffId)
-            elif key == 3:  
-                d_third_task(c, conn)
-            elif key == 4:    
+                secondTask(c, conn, staffId)
+            elif key == '3':  
+                dThirdTask(c, conn)
+            elif key == '4':    
                 # needs to be made
-                d_fourth_task(c, conn)
+                dFourthTask(c, conn)
         
         staffLogout()
         loginScreen(c, conn)
@@ -328,19 +328,19 @@ def main():
     # still have to implement . . .
     elif user == 'N':
         
-        while key != 0:
+        while key != '0':
             
-            key = get_nurse_task()
+            key = getNurseTask()
             
-            if key == 1:
-                first_task(c, conn)
-            elif key == 2:
+            if key == '1':
+                firstTask(c, conn)
+            elif key == '2':
                 Hcno = input(print("Enter the patient's hcno: "))
-                second_task(c, conn, staffId)
-            elif key == 3:  
-                n_third_task(c, conn)
-            elif key == 4:    
-                n_fourth_task(c, conn)
+                secondTask(c, conn, staffId)
+            elif key == '3':  
+                nThirdTask(c, conn)
+            elif key == '4':    
+                nFourthTask(c, conn)
         
         staffLogout()
         loginScreen(c, conn)            
@@ -348,18 +348,18 @@ def main():
     #implement all functions . . .
     elif user == 'A':
         
-        while key != 0:
+        while key != '0':
             
             key = get_admin_task()
             
-            if key == 1:
-                a_first_task(c, conn)
-            elif key == 2:
-                a_second_task(c, conn)
-            elif key == 3:  
-                a_third_task(c, conn)
-            elif key == 4:    
-                a_fourth_task(c, conn)
+            if key == '1':
+                aFirstTask(c, conn)
+            elif key == '2':
+                aSecondTask(c, conn)
+            elif key == '3':  
+                aThirdTask(c, conn)
+            elif key == '4':    
+                aFourthTask(c, conn)
         
         staffLogout()
         loginScreen(c, conn)              

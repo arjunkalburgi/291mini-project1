@@ -34,7 +34,7 @@ def loginScreen(c, conn):
                     loggedIn = True
     return role
 
-# -------------------------- common to doctors and nurses --------------------------
+# -------------------------- start care staff --------------------------
 
 def firstTask():
     
@@ -45,9 +45,15 @@ def firstTask():
     c.execute("SELECT * FROM charts ORDER BY adate;")
     
     # "indicating if it is opened or closed"
-    # implement . . .
+    charts = c.fetchall()
+    for chart in charts:
+        if chart["edate"] == "Null":
+            print(chart["chart_id"], " closed")
+        else:
+            print(chart["chart_id"], " open")
     
     # "the user should be given the option to select a chart"
+    print("-"*10)
     while (not_valid):
         
         chartId = input(print("Enter a chart id (0 to quit): "))
@@ -67,37 +73,51 @@ def firstTask():
     # "all entries associated with that chart must be listed, 
     # ordered by date of entries"
     # implement order. . .
-    c.execute('''
+    c.executescript('''
     SELECT * 
-    FROM charts c, symptoms s, diagnoses d, medications m 
-    WHERE c.chart_id=? 
-    AND c.chart_id = s.chart_id 
-    AND s.chart_id = d.chart_id 
-    AND d.chart_id = m.chart_id;
+    FROM symptoms
+    WHERE chart_id=?
+    ORDER BY obs_date
+    
+    SELECT *
+    FROM diagnoses
+    WHERE chart_id=?
+    ORDER BY ddate
+    
+    SELECT *
+    FROM medications
+    WHERE chart_id=?
+    ORDER BY mdate;
     ''', chartId)
 
     return
 
-def secondTask(hcno, staff_id):
+def secondTask(staffId):
     
     print("-"*10)
-    symptom = input(print("Enter a symptom name: "))
+    not_valid = True
+    
+    # "for a given patient"
+    Hcno = input(print("Enter the patient's hcno: "))
+    
+    # "and an open chart of the patient"
+    while not_true:
+        chartId = input(print("Enter the patient's chart id: "))
+        c.execute("SELECT edate FROM charts WHERE chart_id=?", chartId)
+        Edate = c.fetchone()
+        if Edate == "Null":
+            print("That chart is closed. Please try again.")
+        else:
+            not_valid = False
+    
+    Symptom = input(print("Enter a symptom name: "))
     
     # "add an entry for symptoms"
-    c.execute("SELECT hcno, chart_id, staff_id FROM charts, staff")
-    #row = 
-    # inserts a new row into symptoms -- bulk insert?
-    c.executescript('''
-    CREATE VIEW update_patient 
-    AS SELECT hcno, chart_id, staff_id
-    FROM charts, doctors
-    WHERE charts.hcno=?
-    AND 
-    INSERT INTO symptoms VALUES
-    ''')
+    c.execute("INSERT INTO symptoms VALUES (?,?,?,datetime('localtime'),?)", Hcno, chartId, staffId, Symptom)
+    
     return
 
-# -------------------------- end common to doctors and nurses --------------------------
+# -------------------------- end care staff --------------------------
 # -------------------------- start doctor --------------------------
 
 def getDoctorTask():
@@ -128,14 +148,73 @@ def getDoctorTask():
 def dThirdTask(hcno):
     
     print("-"*10)
-    diagnosis = input(print("Enter a diagnosis: "))
+    not_valid = True
     
-    # implement . . .
+    # "for a given patient"
+    Hcno = input(print("Enter the patient's hcno: "))
     
-    return
+    # "and an open chart of the patient"
+    while not_true:
+        chartId = input(print("Enter the patient's chart id: "))
+        c.execute("SELECT edate FROM charts WHERE chart_id=?", chartId)
+        Edate = c.fetchone()
+        if Edate == "Null":
+            print("That chart is closed. Please try again.")
+        else:
+            not_valid = False
+    
+    Diagnosis = input(print("Enter a diagnosis: "))
+    
+    # "add an entry for symptoms"
+    c.execute("INSERT INTO symptoms VALUES (?,?,?,datetime('localtime'),?)", Hcno, chartId, staffId, Diagnosis)
+    
+    return    
 
 def dFourthTask():
     
+    print("-"*10)
+    not_valid = True
+    
+    # "for a given patient"
+    Hcno = input(print("Enter the patient's hcno: "))
+    
+    # "and an open chart of the patient"
+    while not_true:
+        chartId = input(print("Enter the patient's chart id: "))
+        c.execute("SELECT edate FROM charts WHERE chart_id=?", chartId)
+        Edate = c.fetchone()
+        if Edate == "Null":
+            print("That chart is closed. Please try again.")
+        else:
+            not_valid = False
+    
+    drugName = input(print("Enter a drug: "))
+    startMed = input(print("Enter the start date: "))
+    endMed = input(print("Enter the end date: "))    
+    
+    # check (1)
+    while not_valid:
+        
+        Amount = int(input(print("Enter a daily amount: ")))
+        c.execute("SELECT d.sug_amount FROM dosage d, patients p WHERE p.hcno=? AND p.age_group = d.age_group AND d.drug_name=?", Hcno, drugName)
+        sugAmount = c.fetchone()
+        
+        # "if prescribed amount for the patient is larger than the recommended amount"
+        if sugAmount < Amount:
+            print("WARNING: " + sugAmount + " is the suggested amount of " 
+                  + drugName + " for a patient of " + Hcno + "'s age group.")
+            
+            confirm = input(print("Would you like to confirm your prescription? (Y/N): "))
+            
+            if confirm == 'Y' or confirm == 'y':
+                print("Prescription confirmed.")
+                not_valid = False
+                
+    # check (2)
+    
+    # "add an entry for symptoms"
+    c.execute("INSERT INTO symptoms VALUES (?,?,?,datetime('localtime'),?)", Hcno, chartId, staffId, Diagnosis)    
+    # "add an entry for medications"
     return
 
 # -------------------------- end doctor --------------------------
@@ -197,6 +276,7 @@ def main():
     import os.path 
     conn = sqlite3.connect('memory')
     c = conn.cursor()
+    c.execute(' PRAGMA foreign_keys=ON; ')
     createTables = open('p1-tables.sql', 'r')
     script = createTables.read()
     c.executescript(script)

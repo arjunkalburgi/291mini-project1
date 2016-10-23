@@ -44,7 +44,7 @@ INSERT INTO symptoms VALUES
 ('11137', "2000-06-12 03:21:40.066", 'fever');
 
 -- diagnoses(hcno, chart_id, staff_id, ddate, diagnosis)
-('64328', '60000', '00002', "2000-07-12 07:33:23.006", 'Trypophobia')
+('64328', '60000', '00002', "2000-07-12 07:33:23.006", 'Trypophobia');
 
 -- medications(hcno, mdate, amount, days, drug_name)
 INSERT INTO medications VALUES

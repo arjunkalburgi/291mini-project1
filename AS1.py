@@ -54,7 +54,7 @@ def firstTask():
     
     # "the user should be given the option to select a chart"
     print("-"*10)
-    while (not_valid):
+    while not_valid:
         
         chartId = input(print("Enter a chart id (0 to quit): "))
         
@@ -101,9 +101,9 @@ def secondTask(staffId):
     Hcno = input(print("Enter the patient's hcno: "))
     
     # "and an open chart of the patient"
-    while not_true:
+    while not_valid:
         chartId = input(print("Enter the patient's chart id: "))
-        c.execute("SELECT edate FROM charts WHERE chart_id=?", chartId)
+        c.execute("SELECT edate FROM charts WHERE chart_id=?;", chartId)
         Edate = c.fetchone()
         if Edate == "Null":
             print("That chart is closed. Please try again.")
@@ -113,7 +113,8 @@ def secondTask(staffId):
     Symptom = input(print("Enter a symptom name: "))
     
     # "add an entry for symptoms"
-    c.execute("INSERT INTO symptoms VALUES (?,?,?,datetime('localtime'),?)", Hcno, chartId, staffId, Symptom)
+    c.execute("INSERT INTO symptoms VALUES (?,?,?,datetime('localtime'),?);", Hcno, chartId, staffId, Symptom)
+    conn.commit()
     
     return
 
@@ -154,9 +155,9 @@ def dThirdTask(hcno):
     Hcno = input(print("Enter the patient's hcno: "))
     
     # "and an open chart of the patient"
-    while not_true:
+    while not_valid:
         chartId = input(print("Enter the patient's chart id: "))
-        c.execute("SELECT edate FROM charts WHERE chart_id=?", chartId)
+        c.execute("SELECT edate FROM charts WHERE chart_id=?;", chartId)
         Edate = c.fetchone()
         if Edate == "Null":
             print("That chart is closed. Please try again.")
@@ -166,37 +167,53 @@ def dThirdTask(hcno):
     Diagnosis = input(print("Enter a diagnosis: "))
     
     # "add an entry for symptoms"
-    c.execute("INSERT INTO symptoms VALUES (?,?,?,datetime('localtime'),?)", Hcno, chartId, staffId, Diagnosis)
+    c.execute("INSERT INTO symptoms VALUES (?,?,?,datetime('localtime'),?);", Hcno, chartId, staffId, Diagnosis)
+    conn.commit()
     
     return    
 
 def dFourthTask():
     
     print("-"*10)
-    not_valid = True
+    not_open = True
+    amount_not_valid = True
+    no_allergy_check = True
     
     # "for a given patient"
     Hcno = input(print("Enter the patient's hcno: "))
     
     # "and an open chart of the patient"
-    while not_true:
+    while not_open:
         chartId = input(print("Enter the patient's chart id: "))
-        c.execute("SELECT edate FROM charts WHERE chart_id=?", chartId)
+        c.execute("SELECT edate FROM charts WHERE chart_id=?;", chartId)
         Edate = c.fetchone()
         if Edate == "Null":
             print("That chart is closed. Please try again.")
         else:
-            not_valid = False
+            not_open = False 
     
-    drugName = input(print("Enter a drug: "))
-    startMed = input(print("Enter the start date: "))
-    endMed = input(print("Enter the end date: "))    
+    # check (2)
+    while no_allergy_check:
+        
+        drugName = input(print("Enter a drug name: "))  
+        
+        c.execute("SELECT * FROM inferredallergies ia, patients p WHERE hcno = ? AND (? = ia.alg OR ? = ai.canbe_alg);", Hcno, drugName)        
+        Alg = c.fetchall()
+        
+        if drugName in Alg[alg]:
+            print("WARNING: this patient reported being allergic to " + drugName + ".")
+            
+        elif drugName in Alg[canbe_alg]:
+            print("WARNING: this patient could be allergic to " + drugName + " because they reported an allergy to " Alg[alg] ".")
+            
+        else:
+            no_allergy_check = False
     
     # check (1)
-    while not_valid:
+    while amount_not_valid:
         
         Amount = int(input(print("Enter a daily amount: ")))
-        c.execute("SELECT d.sug_amount FROM dosage d, patients p WHERE p.hcno=? AND p.age_group = d.age_group AND d.drug_name=?", Hcno, drugName)
+        c.execute("SELECT d.sug_amount FROM dosage d, patients p WHERE p.hcno=? AND p.age_group = d.age_group AND d.drug_name=?;", Hcno, drugName)
         sugAmount = c.fetchone()
         
         # "if prescribed amount for the patient is larger than the recommended amount"
@@ -208,13 +225,15 @@ def dFourthTask():
             
             if confirm == 'Y' or confirm == 'y':
                 print("Prescription confirmed.")
-                not_valid = False
-                
-    # check (2)
+                amount_not_valid = False
+
+    startMed = input(print("Enter the start date (YYYY-MM-DD HH:MM:SS): "))
+    endMed = input(print("Enter the end date (YYYY-MM-DD HH:MM:SS): "))   
     
-    # "add an entry for symptoms"
-    c.execute("INSERT INTO symptoms VALUES (?,?,?,datetime('localtime'),?)", Hcno, chartId, staffId, Diagnosis)    
     # "add an entry for medications"
+    c.execute("INSERT INTO medications VALUES (?,?,?,datetime('localtime'),?,?,?,?);", Hcno, chartId, staffId, startMed, endMed, Amount, drugName)    
+    conn.commit()
+    
     return
 
 # -------------------------- end doctor --------------------------
